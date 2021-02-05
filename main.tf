@@ -1,31 +1,24 @@
-terraform {
-  required_version = ">= 0.12.0"
-}
-
-variable "access_key" {
-}
-
-variable "secret_key" {
-}
-
+variable "access_key" {}
+variable "secret_key" {}
 variable "region" {
-  default = "us-east-1"
+  default = "ap-southeast-1"
+}
+#variable "ami" {}
+variable "subnet_id" {}
+variable "identity" {}
+variable "vpc_security_group_ids" {
+  type = list
 }
 
-variable "ami" {
-}
+data "aws_ami" "ubuntu_16_04" {
+  most_recent = true
 
-variable "subnet_id" {
-}
+  filter {
+    name   = "name"
+    values = ["ubuntu/images/hvm-ssd/ubuntu-xenial-16.04-amd64-server-*"]
+  }
 
-variable "vpc_security_group_id" {
-}
-
-variable "identity" {
-}
-
-variable "num_webs" {
-  default = "1"
+  owners = ["099720109477"]
 }
 
 provider "aws" {
@@ -37,11 +30,12 @@ provider "aws" {
 module "server" {
   source = "./server"
 
-  num_webs              = var.num_webs
-  ami                   = var.ami
-  subnet_id             = var.subnet_id
-  vpc_security_group_id = var.vpc_security_group_id
-  identity              = var.identity
+  ami                    = data.aws_ami.ubuntu_16_04.image_id
+  subnet_id              = var.subnet_id
+  vpc_security_group_ids = var.vpc_security_group_ids
+  identity               = var.identity
+  private_key            = module.keypair.private_key_pem
+
 }
 
 output "public_ip" {
@@ -51,4 +45,3 @@ output "public_ip" {
 output "public_dns" {
   value = module.server.public_dns
 }
-
