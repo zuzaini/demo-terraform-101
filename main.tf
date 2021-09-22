@@ -16,6 +16,7 @@ data "aws_ami" "ubuntu_16_04" {
   owners = ["099720109477"]
 }
 
+
 module "server" {
   source = "./server"
 
