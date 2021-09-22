@@ -10,6 +10,7 @@ variable "vpc_security_group_ids" {
   type = list
 }
 
+
 data "aws_ami" "ubuntu_16_04" {
   most_recent = true
 
